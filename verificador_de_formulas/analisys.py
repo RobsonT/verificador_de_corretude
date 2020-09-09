@@ -2,7 +2,7 @@ from rply import ParserGenerator
 from ast import negationDef, binaryDef
 from formule import BinaryFormule, UnaryFormule
 import sys
-sys.tracebacklimit = 0
+#sys.tracebacklimit = 0
 
 class Parser():
     def __init__(self, state):
@@ -61,7 +61,11 @@ class Parser():
         @self.pg.production('step : NUMBER DOT formule DEF_NOT NUMBER')
         def step_negation(p):
             number_line = p[0].value
-            formule = p[2]
+            formule = p[2] 
+            if not isinstance(formule.key, str):
+                print('not',formule.key.key)
+            else:
+                print('not',formule.key)
             line_text = '{}. {} def ~ {}'.format(number_line, formule.toString(), p[4].value)
 
             source_position = p[0].getsourcepos()

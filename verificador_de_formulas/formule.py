@@ -7,10 +7,10 @@ class BinaryFormule():
     def toString(self):
         string = ''
         if self.left is not None :
-            string += self.left.toString()
+            string += '({})'.format(self.left.toString())
         string += self.key
         if self.right is not None :
-            string += self.right.toString()
+            string += '({})'.format(self.right.toString())
         return string
 
 class UnaryFormule():
@@ -21,5 +21,5 @@ class UnaryFormule():
         if isinstance(self.key, str):
             string = '~' + self.key
         else:
-            string = '~' + self.key.toString()
+            string = '~({})'.format(self.key.toString())
         return string    
