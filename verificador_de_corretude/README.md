@@ -15,4 +15,4 @@ O RPLY pode ser instaldo usando o pip ou anaconda
 # Execução 
 * Clone esse repositório;
 * Entre na pasta
-* Execute `python main.py`
+* Execute `python main.py `
