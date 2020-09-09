@@ -63,13 +63,19 @@ class Parser():
             number_line = p[0].value
             formule = p[2] 
             if not isinstance(formule.key, str):
-                print('not',formule.key.key)
+                operator = formule.key.key
             else:
-                print('not',formule.key)
+                operator = formule.key
+
             line_text = '{}. {} def ~ {}'.format(number_line, formule.toString(), p[4].value)
 
             source_position = p[0].getsourcepos()
             line_error = source_position.lineno
+
+            if operator in ['<->', '->', '&', '|']:
+                self.variables[number_line] = [formule]
+                self.set_error(3, line_error, line_text, formule.toString())
+                return
 
             if number_line in self.variables:
                 self.variables[number_line] = self.variables[number_line] + [formule]
@@ -84,7 +90,7 @@ class Parser():
 
             self.variables[number_line] = [formule]
             if not(negationDef().eval(formule, p[4].value, self.variables)):
-                self.set_error(3, line_error, line_text, formule.toString())
+                self.set_error(4, line_error, line_text, formule.toString())
 
         @self.pg.production('step : NUMBER DOT formule AND formule DEF_AND NUMBER HYPHEN NUMBER')
         @self.pg.production('step : NUMBER DOT formule OR formule DEF_OR NUMBER HYPHEN NUMBER')
@@ -118,8 +124,11 @@ class Parser():
                 return
 
             self.variables[number_line] = [formule]
-            if not(binaryDef().eval(formule, operator, used_formule1_line, used_formule2_line, self.variables)):
-                self.set_error(0, line_error, line_text, formule.toString())
+            result = binaryDef().eval(p[2], p[4], operator, used_formule1_line, used_formule2_line, self.variables)
+            if result == 0:
+                self.set_error(0, line_error, line_text, p[2].toString())
+            elif result == 1:
+                self.set_error(0, line_error, line_text, p[4].toString())
 
         @self.pg.production('formule : NOT formule')
         @self.pg.production('formule : ATHOM')
@@ -157,13 +166,15 @@ class Parser():
 
     def set_error(self, type, line_error, line_text, token_error):
         if type == 0:
-            self.error['messages'].append("Uma das formulas que compõe {} não está definido na linha {}: {}".format(token_error, line_error, line_text))
+            self.error['messages'].append("A fórmula {} não foi definido anteriormente, na linha {}: {}".format(token_error, line_error, line_text))
         elif type == 1:
             self.error['messages'].append("Número {} já foi definido antes da linha {}: {}".format(token_error, line_error, line_text))
         elif type == 2:
             self.error['messages'].append("linha não definida {} referenciado na linha {}: {}".format(token_error, line_error, line_text))
+        elif type == 3:
+            self.error['messages'].append("Fórmula {} é binaria, quando o esperado é uma negação, na linha {}: {}".format(token_error, line_error, line_text))
         else: 
-            self.error['messages'].append("{} não está definido na linha {}: {}".format(token_error, line_error, line_text))
+            self.error['messages'].append("Fórmula {} não urilizado na linha {} não foi definido anteriormente: {}".format(token_error[1:], line_error, line_text))
             
     def get_parser(self):
         return self.pg.build()
