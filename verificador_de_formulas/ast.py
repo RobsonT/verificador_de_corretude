@@ -5,7 +5,6 @@ class negationDef():
         pass
 
     def eval(self, formule, formule_line, variables):
-        print(formule.toString())
         for used_formule in variables[formule_line]:
             if formule.toString() == UnaryFormule(used_formule).toString():
                 return True 
