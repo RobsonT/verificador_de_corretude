@@ -62,15 +62,11 @@ class Parser():
         def step_negation(p):
             number_line = p[0].value
             formule = p[2] 
-            if not isinstance(formule.key, str):
-                operator = formule.key.key
-            else:
-                operator = formule.key
 
             source_position = p[0].getsourcepos()
             line_error = source_position.lineno
 
-            if operator in ['<->', '->', '&', '|']:
+            if isinstance(formule, BinaryFormule):
                 self.variables[number_line] = [formule]
                 self.set_error(3, line_error, formule.toString())
                 return
