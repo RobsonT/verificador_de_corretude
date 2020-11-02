@@ -2,7 +2,7 @@ from rply import ParserGenerator
 from ast import negationDef, binaryDef
 from formule import BinaryFormule, UnaryFormule
 import sys
-#sys.tracebacklimit = 0
+sys.tracebacklimit = 0
 
 class Parser():
     def __init__(self, state):
@@ -17,6 +17,7 @@ class Parser():
             ]
         )
         self.variables = {}
+        self.formule_latex = ''
         self.error = {
             'messages': []
         }
@@ -24,7 +25,6 @@ class Parser():
     def parse(self):
         @self.pg.production('program : steps')
         def program(p):
-            formules = p[0]
             if len(self.error['messages']):
                 print('Os seguintes erros foram encontrados:')
                 error_number = 1
@@ -33,7 +33,10 @@ class Parser():
                     print('Erro {}: {}'.format(error_number, error_message))
                     error_number += 1
             else:
-                print('Fórmulas estão corretas.')
+                print('Fórmulas estão corretas. Código látex:')
+                latex = '\\[\n' + self.variables[list(self.variables)[-1]][0].toLatex() +'\\]\n'
+                print(latex)
+
 
         @self.pg.production('steps : steps step')
         @self.pg.production('steps : step')
@@ -44,14 +47,13 @@ class Parser():
         def step_base(p):
             number_line = p[0].value
             athoms = [p[2].value] + p[3]
-            line_text = '{}. {} def A'.format(number_line, athoms)
 
             if number_line in self.variables:
                 for athom in athoms:
                     self.variables[number_line].append(BinaryFormule(key=athom))
                 source_position = p[0].getsourcepos()
                 line_error = source_position.lineno
-                self.set_error(1, line_error, line_text, number_line)
+                self.set_error(1, line_error, number_line)
                 return
                 
             self.variables[number_line] = []
@@ -61,7 +63,7 @@ class Parser():
         @self.pg.production('step : NUMBER DOT formule DEF_NOT NUMBER')
         def step_negation(p):
             number_line = p[0].value
-            formule = p[2] 
+            formule = p[2]
 
             source_position = p[0].getsourcepos()
             line_error = source_position.lineno
@@ -86,19 +88,20 @@ class Parser():
             if not(negationDef().eval(formule, p[4].value, self.variables)):
                 self.set_error(4, line_error, formule.toString())
 
-        @self.pg.production('step : NUMBER DOT formule AND formule DEF_AND NUMBER HYPHEN NUMBER')
-        @self.pg.production('step : NUMBER DOT formule OR formule DEF_OR NUMBER HYPHEN NUMBER')
-        @self.pg.production('step : NUMBER DOT formule IMPLIE formule DEF_IMPLIE NUMBER HYPHEN NUMBER')
-        @self.pg.production('step : NUMBER DOT formule IFF formule DEF_IFF NUMBER HYPHEN NUMBER')
+        @self.pg.production('step : NUMBER DOT formule DEF_AND NUMBER HYPHEN NUMBER')
+        @self.pg.production('step : NUMBER DOT formule DEF_OR NUMBER HYPHEN NUMBER')
+        @self.pg.production('step : NUMBER DOT formule DEF_IMPLIE NUMBER HYPHEN NUMBER')
+        @self.pg.production('step : NUMBER DOT formule DEF_IFF NUMBER HYPHEN NUMBER')
         def step(p):
-            number_line = p[0].value
-            operator = p[3].value    
-            used_formule1_line = p[6].value
-            used_formule2_line = p[8].value
-
-            formule = BinaryFormule(key = operator, left=p[2], right=p[4])
+            formule = p[2]
+            operator = formule.key
             
             line_error = p[0].getsourcepos().lineno
+
+            number_line = p[0].value 
+
+            used_formule1_line = p[4].value
+            used_formule2_line = p[6].value
 
             if number_line in self.variables:
                 self.variables[number_line] = self.variables[number_line] + [formule]
@@ -112,15 +115,15 @@ class Parser():
 
             if not(used_formule2_line in self.variables):
                 self.variables[number_line] = [formule]
-                self.set_error(2, line_error, line_text, used_formule2_line)
+                self.set_error(2, line_error, used_formule2_line)
                 return
 
             self.variables[number_line] = [formule]
-            result = binaryDef().eval(p[2], p[4], operator, used_formule1_line, used_formule2_line, self.variables)
+            result = binaryDef().eval(p[2], operator, used_formule1_line, used_formule2_line, self.variables)
             if result == 0:
-                self.set_error(0, line_error, p[2].toString())
+                self.set_error(0, line_error, formule.left.toString())
             elif result == 1:
-                self.set_error(0, line_error, p[4].toString())
+                self.set_error(0, line_error, formule.right.toString())
 
         @self.pg.production('formule : NOT formule')
         @self.pg.production('formule : ATHOM')
@@ -151,9 +154,12 @@ class Parser():
         @self.pg.error
         def error_handle(token):
             productions = self.state.splitlines()
-            source_position = token.getsourcepos()
-            line, column = source_position.lineno, source_position.colno
-            raise ValueError("token {} não esperado na linha {}: {}".format(token.value, line, productions[line-1]))
+            if token.gettokentype() == '$end':
+                raise ValueError('Uma das definições não está completa, verifica se todas regras foram aplicadas corretamente.')
+            else:
+                source_position = token.getsourcepos()
+                line = source_position.lineno
+                raise ValueError("token {} não esperado na linha {}: {}".format(token.value, line, productions[line-1]))
 
 
     def set_error(self, type, line_error, token_error):

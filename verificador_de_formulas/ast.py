@@ -15,9 +15,9 @@ class binaryDef():
     def __init__(self):
         pass
 
-    def eval(self, formule1, formule2, operator, formule1_line, formule2_line, variables):
-        if formule1.toString() in [item.toString() for item in variables[formule1_line]]:
-            if formule2.toString() in [item.toString() for item in variables[formule2_line]]:
+    def eval(self, formule, operator, formule1_line, formule2_line, variables):
+        if formule.left.toString() in [item.toString() for item in variables[formule1_line]]:
+            if formule.right.toString() in [item.toString() for item in variables[formule2_line]]:
                 return 2
             return 1
         return 0
