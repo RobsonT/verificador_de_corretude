@@ -7,22 +7,19 @@ class Lexer():
 
     def _add_tokens(self):
         # Dot
-        # TODO
-
-        # Epsilon
-        # TODO
+        self.lexer.add('DOT', r'\.')
 
         # Parentheses
-        # TODO open parentheses
-        # TODO close parentheses
+        self.lexer.add('OPEN_PAREN', r'\(')
+        self.lexer.add('CLOSE_PAREN', r'\)')
 
         # Connectives and rules
         self.lexer.add('NOT', r'\~')
         self.lexer.add('IMPLIE', r'\->')
         self.lexer.add('AND', r'\&')
         self.lexer.add('OR', r'\|')
-        # TODO RAA
-        # TODO Contradiction
+        self.lexer.add('RAA', r'raa')
+        self.lexer.add('BOTTOM', r'\@')
 
         # Number
         self.lexer.add('NUM', r'\d+')

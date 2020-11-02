@@ -2,6 +2,7 @@ from lexer import Lexer
 
 text_input = """
 a -> b
+@ & raa
 """
 
 lexer = Lexer().get_lexer()
