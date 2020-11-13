@@ -2,7 +2,7 @@ from rply import ParserGenerator
 from ast import negationDef, binaryDef
 from formule import BinaryFormule, UnaryFormule
 import sys
-import json
+from file_handle import fileHandle
 sys.tracebacklimit = 0
 
 class Parser():
@@ -33,8 +33,6 @@ class Parser():
                 
                 data["status"] = "error"
                 data["firstMessage"] = firstMessage
-                
-                print(firstMessage)
 
                 error_number = 1
                 errorList = []
@@ -51,16 +49,11 @@ class Parser():
                 data["status"] = 'ok'
                 data["firstMessage"] = firstMessage
 
-                print(firstMessage)
-
                 latex = '\\[\n' + self.variables[list(self.variables)[-1]][0].toLatex() +'\\]\n'
                 
                 data["latex"] = latex
 
-                print(latex)
-
-            with open('./files/response.json', 'w', encoding='utf-8') as f:
-                    json.dump(data, f, ensure_ascii=False, indent=4)
+            fileHandle(data)
 
 
         @self.pg.production('steps : steps step')
@@ -179,14 +172,25 @@ class Parser():
         @self.pg.error
         def error_handle(token):
             productions = self.state.splitlines()
+            error = ''
             if(productions == ['']):
-                raise ValueError('Nenhuma demonstração foi recebida, verifique a entrada.')
+                error = 'Nenhuma demonstração foi recebida, verifique a entrada.'
             if token.gettokentype() == '$end':
-                raise ValueError('Uma das definições não está completa, verifica se todas regras foram aplicadas corretamente.')
+                error = 'Uma das definições não está completa, verifica se todas regras foram aplicadas corretamente.'
             else:
                 source_position = token.getsourcepos()
                 line = source_position.lineno
-                raise ValueError("token {} não esperado na linha {}: {}".format(token.value, line, productions[line-1]))
+                error = "token {} não esperado na linha {}: {}".format(token.value, line, productions[line-1])
+                
+            data = {
+                'status': 'error',
+                'firstMessage': 'O seguinte erro foi encontrado',
+                'error': error
+            }
+
+            fileHandle(data)
+
+            raise ValueError(error)
 
 
     def set_error(self, type, line_error, token_error):
