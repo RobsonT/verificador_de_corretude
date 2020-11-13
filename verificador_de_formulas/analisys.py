@@ -2,6 +2,7 @@ from rply import ParserGenerator
 from ast import negationDef, binaryDef
 from formule import BinaryFormule, UnaryFormule
 import sys
+import json
 sys.tracebacklimit = 0
 
 class Parser():
@@ -25,17 +26,41 @@ class Parser():
     def parse(self):
         @self.pg.production('program : steps')
         def program(p):
+            data = {}
+
             if len(self.error['messages']):
-                print('Os seguintes erros foram encontrados:')
+                firstMessage = 'Os seguintes erros foram encontrados:'
+                
+                data["status"] = "error"
+                data["firstMessage"] = firstMessage
+                
+                print(firstMessage)
+
                 error_number = 1
+                errorList = []
 
                 for error_message in self.error['messages']:
-                    print('Erro {}: {}'.format(error_number, error_message))
+                    errorList.append('Erro {}: {}'.format(error_number, error_message))
                     error_number += 1
+
+                data["errorList"] = errorList
+                data["errorNumber"] = error_number
             else:
-                print('Fórmulas estão corretas. Código látex:')
+                firstMessage = 'Fórmulas estão corretas. Código látex:'
+
+                data["status"] = 'ok'
+                data["firstMessage"] = firstMessage
+
+                print(firstMessage)
+
                 latex = '\\[\n' + self.variables[list(self.variables)[-1]][0].toLatex() +'\\]\n'
+                
+                data["latex"] = latex
+
                 print(latex)
+
+            with open('./files/response.json', 'w', encoding='utf-8') as f:
+                    json.dump(data, f, ensure_ascii=False, indent=4)
 
 
         @self.pg.production('steps : steps step')

@@ -1,8 +1,8 @@
 from lexer import Lexer
 from analisys import Parser
 
-text_input = """1. A, C def A
-2. ~A def ~ 1
+text_input = """1. Ab def A
+2. ~Ab def ~ 1
 """
 
 lexer = Lexer().get_lexer()
