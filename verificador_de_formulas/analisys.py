@@ -154,6 +154,8 @@ class Parser():
         @self.pg.error
         def error_handle(token):
             productions = self.state.splitlines()
+            if(productions == ['']):
+                raise ValueError('Nenhuma demonstração foi recebida, verifique a entrada.')
             if token.gettokentype() == '$end':
                 raise ValueError('Uma das definições não está completa, verifica se todas regras foram aplicadas corretamente.')
             else:
