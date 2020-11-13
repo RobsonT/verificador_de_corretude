@@ -22,17 +22,11 @@ class Lexer():
         self.lexer.add('BOTTOM', r'\@')
 
         #rules
-        #TODO implie introduction
         self.lexer.add('IMP_INTROD', r'\->i')
-        #TODO implie elimination
         self.lexer.add('IMP_ELIM', r'\->e')
-        #TODO or introduction
         self.lexer.add('OR_INTROD', r'\|i')
-        #TODO or elimination
         self.lexer.add('OR_ELIM', r'\|e')
-        #TODO And introduction
         self.lexer.add('AND_INTROD', r'\&i')
-        #TODO And elimination
         self.lexer.add('AND_ELIM', r'\&e')
         self.lexer.add('NEG_INTROD', r'\~i')
         self.lexer.add('NEG_ELIM', r'\~e')
@@ -46,9 +40,7 @@ class Lexer():
         self.lexer.add('ATHOM', r'[a-zA-Z][a-zA-Z0-9]*' )
 
         #justification
-        #TODO hypothesis
         self.lexer.add('HYPOTESIS', r'hyp')
-        #TODO premise
         self.lexer.add('PREMISE', r'pre')
 
         # Ignore spaces
