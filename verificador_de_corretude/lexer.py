@@ -18,8 +18,6 @@ class Lexer():
         self.lexer.add('IMPLIE', r'\->')
         self.lexer.add('AND', r'\&')
         self.lexer.add('OR', r'\|')
-        self.lexer.add('RAA', r'raa')
-        self.lexer.add('BOTTOM', r'\@')
 
         #rules
         #TODO implie elimination
