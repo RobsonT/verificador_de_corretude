@@ -2,7 +2,11 @@ from rply import ParserGenerator
 from ast import negationDef, binaryDef
 from formule import BinaryFormule, UnaryFormule
 import sys
-sys.tracebacklimit = 0
+
+def value_error_handle(exctype, value, tb):
+    print(value)
+
+sys.excepthook = value_error_handle
 
 class Parser():
     def __init__(self, state):
@@ -38,7 +42,10 @@ class Parser():
                 data["errorList"] = errorList
                 data["errorNumber"] = error_number
             else:
-                print('Fórmulas estão corretas')
+                print("teste")
+                last_index = list(self.variables)[-1]
+                for form in self.variables[last_index]:
+                    print('Fórmula {} está correta'.format(form.toString()))
 
 
         @self.pg.production('steps : steps step')
@@ -166,7 +173,7 @@ class Parser():
                 source_position = token.getsourcepos()
                 line = source_position.lineno
                 error = "token {} não esperado na linha {}: {}".format(token.value, line, productions[line-1])
-
+                
             raise ValueError(error)
 
 
