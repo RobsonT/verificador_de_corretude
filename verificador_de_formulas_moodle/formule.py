@@ -16,7 +16,7 @@ class BinaryFormule():
                 string += self.left.toString()
             else:
                 string += '({})'.format(self.left.toString())
-        string += self.key
+        string += ' {} '.format(self.key)
         if self.right is not None :
             if ((type(self.right) is UnaryFormule) and (self.right.check_is_athom())) | ((type(self.right) is BinaryFormule) and (self.right.left is None)):
                 string += self.right.toString()

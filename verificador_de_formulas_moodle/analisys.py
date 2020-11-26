@@ -38,12 +38,8 @@ class Parser():
                 for error_message in self.error['messages']:
                     print('Erro {}: {}'.format(error_number, error_message))
                     error_number += 1
-
-                data["errorList"] = errorList
-                data["errorNumber"] = error_number
             else:
-                print("teste")
-                last_index = list(self.variables)[-1]
+                last_index = sorted(self.variables.keys())[-1]
                 for form in self.variables[last_index]:
                     print('Fórmula {} está correta'.format(form.toString()))
 
