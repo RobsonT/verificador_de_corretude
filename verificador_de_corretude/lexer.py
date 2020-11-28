@@ -6,6 +6,9 @@ class Lexer():
         self.lexer = LexerGenerator()
 
     def _add_tokens(self):
+        #Comma
+        self.lexer.add('COMMA', r'\,')
+
         # Dot
         self.lexer.add('DOT', r'\.')
 
@@ -27,7 +30,7 @@ class Lexer():
         self.lexer.add('AND_INTROD', r'\&i')
         self.lexer.add('AND_ELIM', r'\&e')
         self.lexer.add('NEG_INTROD', r'\~i')
-        self.lexer.add('NEG_ELIM', r'\~e')
+        self.lexer.add('NEG_ELIM', r'e~')
         self.lexer.add('RAA', r'raa')
         self.lexer.add('BOTTOM', r'\@')
 
